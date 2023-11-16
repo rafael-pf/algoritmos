@@ -15,22 +15,22 @@ typedef struct{
 }List;
 
 Link* create_link(int k, Link *nextval){
-    Link* n;
+    Link* n = new Link;
     n->element=k;
     n->next = nextval;
     return n;
 }
 
 Link* create_link(Link *nextval){
-    Link* n;
+    Link* n = new Link;
     n->next=nextval;
     return n;
 }
 
-List create_list(){
-    List l;
-    l.head = l.curr = l.tail = create_link(NULL);
-    l.cnt=0;
+List* create_list(){
+    List* l = new List;
+    l->head = l->curr = l->tail = create_link(NULL);
+    l->cnt=0;
     return l;
 }
 
@@ -47,16 +47,22 @@ void remove(List* l){
         printf("Erro!\n");
     }
     else{
+        Link *tmp = l->curr->next;
         if(l->tail==l->curr->next){
             l->tail=l->curr;
         }
         l->curr->next= l->curr->next->next;
-        l->cnt--; 
+        delete tmp;
+        l->cnt--;
     }
 }
 
 void moveToStart(List* l){
     l->curr=l->head;
+}
+
+void moveToEnd(List* l){
+    l->curr=l->tail;
 }
 
 void prev(List* l){
@@ -70,9 +76,29 @@ void prev(List* l){
     l->curr=temp;
 }
 
-void prev(List *l){
+void next(List *l){
     if(l->curr!=l->tail){
         l->curr = l->curr->next;
+    }
+}
+
+void delete_list(List *l){
+    Link* tmp = l->head;
+    Link* next = tmp->next;
+    while(tmp->next!=NULL){
+        next = tmp->next;
+        delete tmp;
+        tmp = next;
+    }
+    delete tmp;
+    delete l;
+}
+
+void print_list(List *l){
+    Link *tmp = l->head;
+    while(tmp->next !=  NULL){
+        cout << tmp->next->value << endl;
+        tmp = tmp->next;
     }
 }
 
