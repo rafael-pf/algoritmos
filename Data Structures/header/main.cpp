@@ -19,7 +19,7 @@ int main(){
     moveToEnd(l);
     insert(l, 1);
     printList(l);
-
+    clear(l);
 
     return 0;
 }
