@@ -3,7 +3,7 @@
 using namespace std;
 
 typedef struct{
-    vector<vector<string>> elements;
+    vector<string> elements;
     int m;
     int size;
 }Hash_Table;
@@ -24,12 +24,67 @@ int H(string key, int M){
     return abs(sum)%M;
 }
 
-void insert(Hash_Table* table, string key){
-    
+int Search(Hash_Table* table, string key){
+    int index = H(key, table->m);
+    if(!table->elements[index].empty()){
+        while(table->elements[index]!=key){
+            index++;
+            index%=table->m;
+        }
+        return index;   
+    }
+    return -1;
+}
+
+void RemoveKey(Hash_Table* table, string key){
+    int index = Search(table, key);
+    if(index!=-1){
+        table->size--;
+        table->elements[index].clear();
+    }
+}
+
+void InsertKey(Hash_Table* table, string key){
+    if(table->size<table->m){
+        int index = H(key, table->m);
+        if(table->elements[index].empty()){
+            table->elements[index] = key;
+        }   
+        else{
+            while(!table->elements[index].empty()){
+                index++;
+                index = index % table->m;
+            }
+            table->elements[index] = key;
+        }
+        table->size++;
+    }
 }
 
 int main(){
     
+    int M;
+    cin >> M;
+    Hash_Table* table = create_table(M);
+    string comando, texto;
+
+    while(cin >> comando){
+        if(comando == "add"){
+            cin >> texto;
+            InsertKey(table, texto);
+        }
+        else if(comando == "sch"){
+            cin >> texto;
+            cout << texto << " " << Search(table, texto) << "\n";
+        }
+        else if(comando == "rmv"){
+            cin >> texto;
+            RemoveKey(table, texto);
+        }
+        else{
+            break;
+        }
+    }
     
     return 0;
 }
