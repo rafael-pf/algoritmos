@@ -6,7 +6,6 @@ using namespace std;
 
 typedef struct BSTNode{
     int key;
-    int index;
     int height;
     struct BSTNode* left;
     struct BSTNode* right;
@@ -25,10 +24,31 @@ int getBalance(Node* rt);
 int h(Node* rt);
 Node* rightRotate(Node* rt);
 Node* leftRotate(Node* rt);
+Node* find(BST* bst, int k);
+Node* findhelp(Node* rt, int k);
+Node* findDad(BST* bst, int k);
+Node* findDadHelp(Node* rt, int k, Node* dad);
+int getindex(BST* bst, int k);
+void inorder(Node* rt);
+
 
 int main(){
 
+    int n, k;
+    cin >> n;
+    
+    BST* tree = createBST();
 
+    for(int i=0; i<n; i++){
+        cin >> k;
+        insert(tree, k);
+    }
+
+    cin >> k;
+
+    Node* pai = findDad(tree, k);
+
+    cout << pai->key << "\n";
 
     return 0;
 }
@@ -45,6 +65,7 @@ BST* createBST(){
     BST* bst = new BST;
     bst->nodecount=0;
     bst->root=NULL;
+    return bst;
 }
 
 void insert(BST* bst, int k){
@@ -111,4 +132,62 @@ Node* leftRotate(Node* rt){
     rt->height = 1 + max(h(rt->left), h(rt->right));
     r->height = 1 + max(h(r->left), h(r->right));
     return r;
+}
+
+Node* find(BST* bst, int k){
+    return findhelp(bst->root, k);
+}
+
+Node* findhelp(Node* rt, int k){
+    if(rt==NULL){
+        return NULL;
+    }
+    if(rt->key>k){
+        return findhelp(rt->left, k);
+    }
+    else if(rt->key==k){
+        return rt;
+    } 
+    else {
+        return findhelp(rt->right, k);
+    }
+}
+
+Node* findDad(BST* bst, int k){
+    return findDadHelp(bst->root, k, NULL);
+}
+
+Node* findDadHelp(Node* rt, int k, Node* dad){
+    if(rt==NULL){
+        return NULL;
+    }
+    if(rt->key>k){
+        // pai = rt
+        return findDadHelp(rt->left, k, rt);
+    }
+    else if(rt->key==k){
+        return dad;
+    } 
+    else {
+        // pai = rt
+        return findDadHelp(rt->right, k, rt);
+    }
+}
+
+int getindex(BST* bst, int k){
+    // tem filho da esquerda? indexFilhoEsquerda+1 : indexPai+1
+    // ou
+    // qtd filhos Pai + qtd filhos FilhoEsquerda
+    // falta: referencia Pai - ok
+
+    
+
+    return 0;
+}
+
+void inorder(Node* rt, int k, int* index){
+    if(rt!=NULL){
+        inorder(rt->left);
+        (*index)++;
+    }
 }
