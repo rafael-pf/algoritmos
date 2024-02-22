@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef pair<int, int> SuperPair;
+typedef pair<int, pair<int,int>> SuperPair;
 
 typedef struct {
     int weight;
@@ -69,32 +69,34 @@ void setMark(Graph* g, int v, int val){
     g->mark[v]=val;
 }
 
-void dijkstra(Graph* g, int s, int t, int d[]){
+void prism(Graph* g, int s, int d[], int V[]){
     priority_queue<SuperPair, vector<SuperPair>, greater<SuperPair>> heap;
+    int p=0,v=0,w=0,peso=0;
     int count=0;
-    int v=0,w=0, peso=0;
     for(int i=0; i<g->numVertices; i++){
         d[i] = INT_MAX;
+        V[i] = -1;
         g->mark[i]=0;
     }
-    heap.push({0, s});
-    d[s]=0;
+    heap.push({0, {0, 0}});
+    d[0]=0;
     for(int i=0; i<g->numVertices; i++){
         do{
             if(heap.empty()) return;
-            v = heap.top().second;
-            if(v == t) return;
+            p = heap.top().second.first;
+            v = heap.top().second.second;
             heap.pop();
         }while(g->mark[v]);
         g->mark[v]=1;
+        V[v]=p;
         w = first(g, v);
-        count = 0;
+        count=0;
         while(w<g->numVertices){
             if(!g->mark[w]){
                 peso = weight(g, v, w);
-                if(d[w] > d[v] + peso){
-                    d[w] = d[v] + peso;
-                    heap.push({d[w], w});
+                if(d[w] > peso){
+                    d[w] = peso;
+                    heap.push({d[w], {v,w}});
                 }
             }
             // w = next(g, v, w);
@@ -107,29 +109,30 @@ void dijkstra(Graph* g, int s, int t, int d[]){
 
 int main(){
 
-    int N, n, m, s, t, u, v, w;
-    cin >> N;
+    int n, m, u, v, w;
 
-    for(int i=0; i<N; i++){
-        cin >> n >> m >> s >> t;
-        if(!m){
-            cout << "Case #" << i+1 << ": " << "unreachable" << "\n";
+    cin >> n >> m;
+    do{
+        if(m == 0){
+            cout << "IMPOSSIBLE\n";
+            cin >> n >> m;
             continue;
         }
         Graph* g = createGraph(n);
-        int d[n];
-        for(int j=0; j<m; j++){
+        int d[n], V[n];
+        for(int i=0; i<m; i++){
             cin >> u >> v >> w;
             insertEdge(g, u, v, w);
         }
-        if(m==1){
-            cout << "Case #" << i+1 << ": " << w << "\n";
-            continue;
+        prism(g, 0, d, V);
+        int min=0;
+        for(int i=1; i<n; i++){
+            if(d[i]>min) min=d[i];
         }
-        dijkstra(g, s, t, d);
-        if(d[t]!=INT_MAX) cout << "Case #" << i+1 << ": " << d[t] << "\n";
-        else cout << "Case #" << i+1 << ": " << "unreachable" << "\n";
-    }
+        if(min>0 && min<INT_MAX) cout << min << "\n";
+        else cout << "IMPOSSIBLE\n";
+        cin >> n >> m;
+    }while(!(n==0 && m==0));
 
     return 0;
 }
