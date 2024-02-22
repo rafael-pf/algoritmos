@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef pair<int, pair<int, int>> SuperPair;
+typedef pair<int, int> SuperPair;
 
 typedef struct {
     int weight;
@@ -70,30 +70,30 @@ void setMark(Graph* g, int v, int val){
 }
 
 void dijkstra(Graph* g, int s, int t, int d[]){
-    int* P = new int[g->numVertices];
     priority_queue<SuperPair, vector<SuperPair>, greater<SuperPair>> heap;
-    int p=0,v=0,w=0;
+    int v=0,w=0, peso=0;
     for(int i=0; i<g->numVertices; i++){
         d[i] = INT_MAX;
-        // P[i] = -1;
-        setMark(g, i, 0);
+        g->mark[i]=0;
     }
-    heap.push({0, {s, s}});
+    heap.push({0, s});
     d[s]=0;
     for(int i=0; i<g->numVertices; i++){
         do{
             if(heap.empty()) return;
-            p = heap.top().second.first;
-            v = heap.top().second.second;
+            v = heap.top().second;
+            if(v == t) return;
             heap.pop();
-        }while(getMark(g, v));
-        setMark(g, v, 1);
-        // P[v] = p;
+        }while(g->mark[v]);
+        g->mark[v]=1;
         w = first(g, v);
         while(w<g->numVertices){
-            if(!getMark(g, w) && d[w] > d[v] + weight(g, v, w)){
-                d[w] = d[v] + weight(g, v, w);
-                heap.push({d[w], {v, w}});
+            if(!g->mark[w]){
+                peso = weight(g, v, w);
+                if(d[w] > d[v] + peso){
+                    d[w] = d[v] + peso;
+                    heap.push({d[w], w});
+                }
             }
             w = next(g, v, w);
         }
@@ -107,11 +107,19 @@ int main(){
 
     for(int i=0; i<N; i++){
         cin >> n >> m >> s >> t;
+        if(!m){
+            cout << "Case #" << i+1 << ": " << "unreachable" << "\n";
+            continue;
+        }
         Graph* g = createGraph(n);
         int d[n];
         for(int j=0; j<m; j++){
             cin >> u >> v >> w;
             insertEdge(g, u, v, w);
+        }
+        if(m==1){
+            cout << "Case #" << i+1 << ": " << w << "\n";
+            continue;
         }
         dijkstra(g, s, t, d);
         if(d[t]!=INT_MAX) cout << "Case #" << i+1 << ": " << d[t] << "\n";
